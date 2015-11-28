@@ -1,0 +1,15 @@
+!_TAG_FILE_SORTED	2	/0=unsorted, 1=sorted, 2=foldcase/
+#:cl-polynomial-calculator	/home/jack/MEGA/LispCoursework/package.lisp	/^(cl:defpackage #:cl-polynomial-calculator$/;"	f	language:Lisp
+:polynomial-calculator	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defpackage :polynomial-calculator$/;"	f	language:Lisp
+check	/home/jack/MEGA/LispCoursework/tests.lisp	/^(defmacro check (&body forms)$/;"	f	language:Lisp
+collect-inputs	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun collect-inputs (args)$/;"	f	language:Lisp
+get-arithmetic-function	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun get-arithmetic-function (input)$/;"	f	language:Lisp
+main	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun main (&rest args)$/;"	f	language:Lisp
+my-system	/home/jack/MEGA/LispCoursework/polynomial-calculator.asd	/^(defsystem my-system$/;"	f	language:Lisp
+poly*	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun poly* (p1 p2)$/;"	f	language:Lisp
+poly+	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun poly+ (p1 p2)$/;"	f	language:Lisp
+poly-	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun poly- (p1 p2)$/;"	f	language:Lisp
+prompt-read	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun prompt-read (prompt)$/;"	f	language:Lisp
+prompt-user-input	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun prompt-user-input ()$/;"	f	language:Lisp
+report-result	/home/jack/MEGA/LispCoursework/tests.lisp	/^(defun report-result (result form)$/;"	f	language:Lisp
+test	/home/jack/MEGA/LispCoursework/tests.lisp	/^(defun test ()$/;"	f	language:Lisp
