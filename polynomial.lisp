@@ -1,11 +1,20 @@
-;;; PACKAGE DECLARATIONS
+:;; PACKAGE DECLARATIONS
 (defpackage :polynomial-calculator
   (:use :common-lisp)
-  (:export :polly+
-           :polly-
-           :poll*))
+  (:export :poly+
+           :poly-
+           :pol*))
 
 (in-package :polynomial-calculator)
+
+
+; ███████╗██╗   ██╗ ██████╗██╗  ██╗    ██╗     ██╗███████╗██████╗
+; ██╔════╝██║   ██║██╔════╝██║ ██╔╝    ██║     ██║██╔════╝██╔══██╗
+; █████╗  ██║   ██║██║     █████╔╝     ██║     ██║███████╗██████╔╝
+; ██╔══╝  ██║   ██║██║     ██╔═██╗     ██║     ██║╚════██║██╔═══╝
+; ██║     ╚██████╔╝╚██████╗██║  ██╗    ███████╗██║███████║██║
+; ╚═╝      ╚═════╝  ╚═════╝╚═╝  ╚═╝    ╚══════╝╚═╝╚══════╝╚═╝
+
 
 ;; ARITHMETIC FUNCTIONS
 (defun poly+ (p1 p2)
@@ -35,26 +44,19 @@
   ;; Loop through the rest of the list and check for nested lists
   (find-nested (rest input)))
 
-
-;; Simplyfies a polynomial expression
-(defun simplyfy-expression (input &key terms counter)
-  (if (eql input nil)
-    (return-from simplyfy-expression))
-  (if (check-for-arithmetic-symbol (car input))
-    (format t "Current symbol: ~d~%" (car input))
-    (progn
-      (format t "Number: ~d~%" (car input))))
-  (simplyfy-expression (rest input)))
-
-
 ;; Checks to see if given input contains an arithmetic symbol
 (defun check-for-arithmetic-symbol (input)
-  (let ((input (write-to-string input)))
-    (if (or
-          (string-equal input '+)
-          (string-equal input '-)
-          (string-equal input '*))
-      T Nil)))
+  (if (check-if-strings-equal (write-to-string input) '(+ - *))
+    T nil))
+
+
+;; Checks if an input string is equal to a number of other strings
+(defun check-if-strings-equal (input vals)
+  ;; If vals is empty return false
+  (if (eql vals nil) nil)
+  ;; If yes return true else recursively call the function
+  (if (string-equal input (car vals))
+    T  (check-if-strings-equal input (rest vals)))) 
 
 
 ;;; Create interactive prompt to enter data
@@ -109,9 +111,9 @@
           (poly2 (poly-simplyfy (nth 2 input))))
       (funcall (get-arithmetic-function input) poly1 poly2))))
 
+
 ;; A bunch of simplyfied test cases
-; (main '(+ (+ (+ x x) (- 2y y)) (+ x y z)))
-(main '(+ (+ (+ 5x x) (- 2x x)) (+ y y)))
+; (main '(+ (+ (+ x x) (+ 5y y) (- 2y y)) (+ x y z)))
+; (main '(+ (+ (+ 5x x) (- 2x x)) (+ y y)))
 ; (main '(+ (+ x x) (+ y y)))
 ; (main)
-
