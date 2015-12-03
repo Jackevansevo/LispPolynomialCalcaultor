@@ -1,50 +1,79 @@
-; ;; Checks to see if given input contains an arithmetic symbol
-; (defun check-for-arithmetic-symbol (input)
-;   (if (check-if-strings-equal (write-to-string input) '(+ - *))
-;     T Nil))
-
-
-; ;; Checks if an input string is equal to a number of other strings
-; (defun check-if-strings-equal (input vals)
-;   ;; If vals is empty return false
-;   (if (eql vals nil) (return-from check-if-strings-equal Nil))
-
-;   ;; If yes return true else recursively call the function
-;   (if (string-equal input (car vals))
-;     T  (check-if-strings-equal input (rest vals))))
-
-; ;; Simplyfies a polynomial (Hopefully)
-; (defun simplyfy (input &key (counter 1 sign-supplied-p) (sign Nil sign-supplied-p))
-;   ;; If the list is empty, we've finished processing
-;   (if (eql input nil)
-;     (return-from simplyfy))
-;   ;; If it's a symbol
-;   (if (check-for-arithmetic-symbol (car input))
-;     (simplyfy (rest input) :sign (car input)))
-;     ;; It it's a number
-;     (progn
-;       ;; Check to see how many times this number occurs in the polynomial
-;       (get-number-of-occurances (car input) input)
-
-;       ;; If it's the same then increment the counter by one
-;       (simplyfy (rest input) :counter (+ counter 1) :sign sign )
-;       ;; Else then don't increment the counter
-;       (simplyfy (rest input) :counter counter :sign sign )))
-
-
-
-;; [TODO] Make this work for 5x and 8y
-;; Returns the number of occurances of a number/symbol in a polynomial
-(defun get-number-of-occurances (target input &key (counter 0))
+;; Returns the number of occurrences of a number/symbol in a polynomial
+(defun get-number-of-occurrences (target input &key (counter 0) operator)
   (if (eql input nil)
-    (return-from get-number-of-occurances counter))
+    (return-from get-number-of-occurrences counter))
 
-  ;; Check if current position in list matches the target
-  (if (eql target (car input))
-    ;; If it does then increment the counter
-    (get-number-of-occurances target (rest input) :counter (+ counter 1))
+  (if (has-operator (car input))
+    (get-number-of-occurrences target (rest input) :counter counter :operator (car input)))
+
+  (if (string-equal target (get-sign (car input)))
+    ;; If it does then find out what value it is and increment the counter by that amount
+    (progn
+      (let ((sign-value (get-sign-value (car input))))
+        (get-number-of-occurrences target (rest input) :counter (+ counter sign-value))))
     ;; Else keep scanning the list
-    (get-number-of-occurances target (rest input) :counter counter)))
+    (get-number-of-occurrences target (rest input) :counter counter)))
 
 
-(format t "Count: ~d~%" (get-number-of-occurances 'x '(+ x 5x)))
+;; Returns the integer value in-front of a artihmetic sign
+(defun get-sign-value (input)
+  (let ((string-input (strip-chars (write-to-string input) "|")))
+    ;; If the character is just a single x, y or z then return 1
+    (if (eql (length string-input) 1)
+      1
+      (parse-integer (remove-last-character string-input)))))
+
+
+;; Removes the last character from a given string
+(defun remove-last-character (input)
+  (subseq input 0 (1- (length input))))
+
+
+;; Returns the sign of a given input value
+(defun get-sign (input)
+  ;; Convert the input to a string and strip off annoying '|' characters
+  (get-last-character (strip-chars (write-to-string input) "|")))
+
+
+;; Returns the last character of a tring
+(defun get-last-character (input)
+  (subseq input (- (length input) 1) (length input)))
+
+
+;; Strip characters from a string
+;; http://rosettacode.org/wiki/Strip_a_set_of_characters_from_a_string#Common_Lisp
+(defun strip-chars (str chars)
+  (remove-if (lambda (ch) (find ch chars)) str))
+
+
+;; Checks to see if given input contains an arithmetic symbol
+(defun has-operator (input)
+  (if (check-if-strings-equal (write-to-string input) '(+ - *))
+    T Nil))
+
+
+;; Checks if an input string is equal to a number of other strings
+(defun check-if-strings-equal (input vals)
+  ;; If vals is empty return false
+  (if (eql vals nil) (return-from check-if-strings-equal Nil))
+  ;; If yes return true else recursively call the function
+  (if (string-equal input (car vals))
+    T  (check-if-strings-equal input (rest vals))))
+
+
+;; Collects terms of a specific target in a given list
+(defun collect-terms (target input &key results)
+  ;; If the list is empty return the results
+  (if (eql input nil)
+      (return-from collect-terms (eval(reverse results))))
+  ;; Check if the current list position contains a value equal to our target
+  (if (string-equal target (get-sign (car input)))
+    (collect-terms target (rest input) :results (cons (get-sign-value (car input)) results))
+    ;; If not  then check if it's an operator
+    (if (has-operator (car input))
+      (collect-terms target (rest input) :results (cons (car input) results))
+      ;; Failing that move onto the next position
+      (collect-terms target (rest input) :results results))))
+
+
+(format t "Collected terms: ~d~%" (collect-terms 'x '(+ 5x 2x)))
