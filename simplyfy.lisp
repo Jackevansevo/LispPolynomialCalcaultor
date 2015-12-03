@@ -1,20 +1,3 @@
-;; Returns the number of occurrences of a number/symbol in a polynomial
-(defun get-number-of-occurrences (target input &key (counter 0) operator)
-  (if (eql input nil)
-    (return-from get-number-of-occurrences counter))
-
-  (if (has-operator (car input))
-    (get-number-of-occurrences target (rest input) :counter counter :operator (car input)))
-
-  (if (string-equal target (get-sign (car input)))
-    ;; If it does then find out what value it is and increment the counter by that amount
-    (progn
-      (let ((sign-value (get-sign-value (car input))))
-        (get-number-of-occurrences target (rest input) :counter (+ counter sign-value))))
-    ;; Else keep scanning the list
-    (get-number-of-occurrences target (rest input) :counter counter)))
-
-
 ;; Returns the integer value in-front of a artihmetic sign
 (defun get-sign-value (input)
   (let ((string-input (strip-chars (write-to-string input) "|")))
@@ -23,34 +6,28 @@
       1
       (parse-integer (remove-last-character string-input)))))
 
-
 ;; Removes the last character from a given string
 (defun remove-last-character (input)
   (subseq input 0 (1- (length input))))
-
 
 ;; Returns the sign of a given input value
 (defun get-sign (input)
   ;; Convert the input to a string and strip off annoying '|' characters
   (get-last-character (strip-chars (write-to-string input) "|")))
 
-
 ;; Returns the last character of a tring
 (defun get-last-character (input)
   (subseq input (- (length input) 1) (length input)))
-
 
 ;; Strip characters from a string
 ;; http://rosettacode.org/wiki/Strip_a_set_of_characters_from_a_string#Common_Lisp
 (defun strip-chars (str chars)
   (remove-if (lambda (ch) (find ch chars)) str))
 
-
 ;; Checks to see if given input contains an arithmetic symbol
 (defun has-operator (input)
   (if (check-if-strings-equal (write-to-string input) '(+ - *))
     T Nil))
-
 
 ;; Checks if an input string is equal to a number of other strings
 (defun check-if-strings-equal (input vals)
@@ -59,7 +36,6 @@
   ;; If yes return true else recursively call the function
   (if (string-equal input (car vals))
     T  (check-if-strings-equal input (rest vals))))
-
 
 ;; Collects terms of a specific target in a given list
 (defun collect-terms (target input &key results)
