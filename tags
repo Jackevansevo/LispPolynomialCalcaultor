@@ -1,19 +1,24 @@
 !_TAG_FILE_SORTED	2	/0=unsorted, 1=sorted, 2=foldcase/
-#:cl-polynomial-calculator	/home/jack/MEGA/LispCoursework/package.lisp	/^(cl:defpackage #:cl-polynomial-calculator$/;"	f	language:Lisp
-:polynomial-calculator	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defpackage :polynomial-calculator$/;"	f	language:Lisp
-check	/home/jack/MEGA/LispCoursework/tests.lisp	/^(defmacro check (&body forms)$/;"	f	language:Lisp
-check-for-arithmetic-symbol	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun check-for-arithmetic-symbol (input)$/;"	f	language:Lisp
-find-nested	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun find-nested (input)$/;"	f	language:Lisp
-get-arithmetic-function	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun get-arithmetic-function (input)$/;"	f	language:Lisp
-get-user-input	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun get-user-input (args)$/;"	f	language:Lisp
-main	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun main (&rest args)$/;"	f	language:Lisp
-my-system	/home/jack/MEGA/LispCoursework/polynomial-calculator.asd	/^(defsystem my-system$/;"	f	language:Lisp
-poly*	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun poly* (p1 p2)$/;"	f	language:Lisp
-poly+	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun poly+ (p1 p2)$/;"	f	language:Lisp
-poly-	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun poly- (p1 p2)$/;"	f	language:Lisp
-poly-simplyfy	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun poly-simplyfy (input)$/;"	f	language:Lisp
-prompt-read	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun prompt-read (prompt)$/;"	f	language:Lisp
-prompt-user-input	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun prompt-user-input ()$/;"	f	language:Lisp
-report-result	/home/jack/MEGA/LispCoursework/tests.lisp	/^(defun report-result (result form)$/;"	f	language:Lisp
-simplyfy-expression	/home/jack/MEGA/LispCoursework/polynomial.lisp	/^(defun simplyfy-expression (input &key terms counter)$/;"	f	language:Lisp
-test	/home/jack/MEGA/LispCoursework/tests.lisp	/^(defun test ()$/;"	f	language:Lisp
+check	/home/jack/MEGA/LispCoursework/tests.cl	/^(defmacro check (&body forms)$/;"	f	language:Lisp
+check-if-strings-equal	/home/jack/MEGA/LispCoursework/simplyfy.cl	/^(defun check-if-strings-equal (input vals)$/;"	f	language:Lisp
+collect-terms	/home/jack/MEGA/LispCoursework/simplyfy.cl	/^(defun collect-terms (target input &key results)$/;"	f	language:Lisp
+find-nested	/home/jack/MEGA/LispCoursework/simplyfy.cl	/^(defun find-nested (input)$/;"	f	language:Lisp
+get-last-integer-position	/home/jack/MEGA/LispCoursework/simplyfy.cl	/^(defun get-last-integer-position (input &key (pos 0))$/;"	f	language:Lisp
+get-sign	/home/jack/MEGA/LispCoursework/simplyfy.cl	/^(defun get-sign (input)$/;"	f	language:Lisp
+get-sign-value	/home/jack/MEGA/LispCoursework/simplyfy.cl	/^(defun get-sign-value (input)$/;"	f	language:Lisp
+get-user-input	/home/jack/MEGA/LispCoursework/polynomial.cl	/^(defun get-user-input (args)$/;"	f	language:Lisp
+has-integers	/home/jack/MEGA/LispCoursework/simplyfy.cl	/^(defun has-integers (input)$/;"	f	language:Lisp
+has-operator	/home/jack/MEGA/LispCoursework/simplyfy.cl	/^(defun has-operator (input)$/;"	f	language:Lisp
+main	/home/jack/MEGA/LispCoursework/polynomial.cl	/^(defun main (&rest args)$/;"	f	language:Lisp
+poly+	/home/jack/MEGA/LispCoursework/polynomial.cl	/^(defun poly+ (p1 p2)$/;"	f	language:Lisp
+prompt-read	/home/jack/MEGA/LispCoursework/polynomial.cl	/^(defun prompt-read (prompt)$/;"	f	language:Lisp
+prompt-user-input	/home/jack/MEGA/LispCoursework/polynomial.cl	/^(defun prompt-user-input ()$/;"	f	language:Lisp
+report-result	/home/jack/MEGA/LispCoursework/tests.cl	/^(defun report-result (result form)$/;"	f	language:Lisp
+scan-for-terms	/home/jack/MEGA/LispCoursework/simplyfy.cl	/^(defun scan-for-terms (input &key scanned)$/;"	f	language:Lisp
+strip-chars	/home/jack/MEGA/LispCoursework/simplyfy.cl	/^(defun strip-chars (str chars)$/;"	f	language:Lisp
+strip-integers	/home/jack/MEGA/LispCoursework/simplyfy.cl	/^(defun strip-integers (input)$/;"	f	language:Lisp
+strip-symbols	/home/jack/MEGA/LispCoursework/simplyfy.cl	/^(defun strip-symbols (input)$/;"	f	language:Lisp
+test-collect-terms	/home/jack/MEGA/LispCoursework/tests.cl	/^(defun test-collect-terms ()$/;"	f	language:Lisp
+test-get-sign	/home/jack/MEGA/LispCoursework/tests.cl	/^(defun test-get-sign ()$/;"	f	language:Lisp
+test-get-sign-value	/home/jack/MEGA/LispCoursework/tests.cl	/^(defun test-get-sign-value ()$/;"	f	language:Lisp
+test-has-integers	/home/jack/MEGA/LispCoursework/tests.cl	/^(defun test-has-integers ()$/;"	f	language:Lisp
