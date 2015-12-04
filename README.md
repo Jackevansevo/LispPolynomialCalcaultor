@@ -23,4 +23,4 @@
 
 # Instructions
 
-- Coming soon ಥ‿ಥ 
+- Coming soon!
