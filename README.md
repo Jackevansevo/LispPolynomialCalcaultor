@@ -1,6 +1,3 @@
-##LispPolynomialCalculator
-A simple polynomial calculator written in common lisp
-
 ```
 ██╗     ██╗███████╗██████╗
 ██║     ██║██╔════╝██╔══██╗
@@ -23,3 +20,7 @@ A simple polynomial calculator written in common lisp
 ╚██████╗██║  ██║███████╗╚██████╗╚██████╔╝███████╗██║  ██║   ██║   ╚██████╔╝██║  ██║
  ╚═════╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝
 ```
+
+# Instructions
+
+- Coming soon ಥ‿ಥ 
