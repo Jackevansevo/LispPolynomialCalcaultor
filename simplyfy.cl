@@ -6,10 +6,12 @@
       1
       (parse-integer (strip-symbols string-input)))))
 
+
 ;; Strip characters from a string
 ;; http://rosettacode.org/wiki/Strip_a_set_of_characters_from_a_string#Common_Lisp
 (defun strip-chars (str chars)
   (remove-if (lambda (ch) (find ch chars)) str))
+
 
 ;; Loops through a string and looks for integers
 (defun has-integers (input)
@@ -22,11 +24,13 @@
     ;; Else check the next character in the string
     (has-integers (subseq input 1 (length input)))))
 
+
 ;; Strips all the symbols from the end of a given string
 (defun strip-symbols (input)
   (let ((start 0)
         (end (get-last-integer-position input)))
     (return-from strip-symbols (subseq input start end))))
+
 
 ;; Strips all the integers from the start of a given string
 (defun strip-integers (input)
