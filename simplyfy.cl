@@ -18,7 +18,6 @@
   ;; If the string is empty then quit
   (if (eql (length input) 0)
       (return-from has-integers Nil))
-  ;; Check to see if current position is an integer
   (if (numberp (read-from-string(subseq input 0 1)))
     (return-from has-integers T)
     ;; Else check the next character in the string
@@ -57,7 +56,7 @@
 
 ;; Checks to see if given input contains an arithmetic symbol
 (defun has-operator (input)
-  (if (check-if-strings-equal (write-to-string input) '(+ - *))
+  (if (check-if-strings-equal (write-to-string input) '(+ - * expt))
     T nil))
 
 
@@ -70,15 +69,14 @@
     T  (check-if-strings-equal input (rest vals))))
 
 
-;; Collects terms of a specific target in a given list
+; ;; Collects terms of a specific target in a given list
 (defun collect-terms (target input &key results)
-  ;; Check the target is valid
-  (if (has-integers (strip-chars(write-to-string target) "|"))
-      (return-from collect-terms nil))
-  ;; If the list is empty return the results
+  ;; Checks the target is valid
+  (if (has-integers target)
+    (return-from collect-terms nil))
+  ;; If the list is empty then return the results
   (if (eql input nil)
-    (let ((result (write-to-string(eval(reverse results))))
-          (target (write-to-string target)))
+    (let ((result (write-to-string(eval(reverse results)))))
       (return-from collect-terms (concatenate 'string result target))))
   ;; Check if the current list position contains a value equal to our target
   (if (string-equal target (get-sign (car input)))
@@ -94,24 +92,47 @@
       (collect-terms target (rest input) :results results))))
 
 
-;; Scans through a given list looking for terms to be collected
-(defun scan-for-terms (input &key scanned)
+(defun check-if-in-list (target input)
+  ;; If the input is empty then return false
   (if (eql input nil)
-    (return-from scan-for-terms "finished"))
-  (format t "Current pos ~d~%" (car input))
+    nil
+    (if (equal (car input) target)
+      T
+      (check-if-in-list target (rest input)))))
+
+
+;; [TODO] Make this shit work for numbers aswell
+;; Scans through a given list looking for terms to be collected
+(defun simplyfy-term (input &key (orig input) (scanned '()))
+  ;; If the input is empty then exit
+  (if (eql input nil)
+    (return-from simplyfy-term nil))
+  ;; If it's not an operator, then try to collect some similar terms
   (if (not (has-operator (car input)))
-    (format t "Scanning for: ~d~%" (car input)))
-  (scan-for-terms (rest input)))
+    ;; If this symbol has already been scanned move onto the next position in the list
+    (if (check-if-in-list (get-sign (car input)) scanned)
+      (simplyfy-term (rest input) :orig orig :scanned scanned)
+      (progn
+        ;; Else then try to collect terms containing that symbol
+        (let ((target (write-to-string(get-sign (car input))))
+              (updated-scanned (append scanned (list(get-sign(car input))))))
+          (format t "~d~%" (collect-terms (read-from-string target) orig))
+          (simplyfy-term (rest input) :orig orig :scanned updated-scanned))))
+    (progn
+      (simplyfy-term (rest input) :orig orig :scanned scanned))))
 
 
 ;; Loop through the list looking for nested expressions that can be simplyfied
-(defun find-nested (input)
+(defun find-nested (input &key (orig input))
   (if (eql input nil)
-    (return-from find-nested))
+    (progn
+      (return-from find-nested (simplyfy-term orig))))
   ;; Check if current position is a nested list
   (if (listp (car input))
     (progn
-      (format t "Found nested list: ~d~%" (car input))
-      (scan-for-terms (car input))))
+      (format t "~%Simplyfying: ~d~%" (car input))
+      (simplyfy-term (car input))))
   ;; Loop through the rest of the list and check for nested lists
-  (find-nested (rest input)))
+  (find-nested (rest input) :orig orig))
+
+(format t "~d~%" (collect-terms "n" '(expt 2 3)))
