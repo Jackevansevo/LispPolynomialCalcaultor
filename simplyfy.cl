@@ -121,16 +121,15 @@
     ;; We don't want to collect operators
     (if (has-operator (car input))
       (collect-symbols (rest input) :scanned scanned :orig orig :results results)
-      (progn
-        ;; Check if the symbol of the current position has been scanned
-        (if (check-if-in-list target scanned)
-          (collect-symbols (rest input) :scanned scanned :orig orig :results results)
-          (let ((new-scanned (append scanned (list target)))
-                (new-results (append results (list(collect-terms target orig)))))
-            (collect-symbols (rest input) 
-                              :orig orig 
-                              :scanned new-scanned 
-                              :results new-results)))))))
+      ;; Check if the symbol of the current position has been scanned
+      (if (check-if-in-list target scanned)
+        (collect-symbols (rest input) :scanned scanned :orig orig :results results)
+        (let ((new-scanned (append scanned (list target)))
+              (new-results (append results (list(collect-terms target orig)))))
+          (collect-symbols (rest input) 
+                           :orig orig 
+                           :scanned new-scanned 
+                           :results new-results))))))
 
 ;; Loop through the list looking for nested expressions that can be simplyfied
 (defun find-nested (input &key (orig input))
