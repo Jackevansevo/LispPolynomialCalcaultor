@@ -77,20 +77,20 @@
   (if (eql input nil)
     (let ((result (write-to-string(eval(reverse results)))))
       (return-from collect-terms (concatenate 'string result target))))
-  ;; Check if the current position is an operator
-  (if (or (has-operator (car input)) (string-equal target (get-sign (car input))))
-    (collect-terms target (rest input) :results (cons (get-sign-value(car input)) results))
-    (collect-terms target (rest input) :results results)))
+  (let ((currentPos (car input)))
+    ;; Check if the current position is an operator
+    (if (or (has-operator currentPos) (string-equal target (get-sign currentPos)))
+      (collect-terms target (rest input) :results (cons (get-sign-value currentPos) results))
+      (collect-terms target (rest input) :results results))))
 
 
-;; Collects integer terms in a given list
-(defun collect-integers (input &key (results '()))
+;; Check if a list contains integers
+(defun check-list-for-integers (input)
   (if (eql input nil)
-    (let ((result (write-to-string(eval(reverse results)))))
-      (return-from collect-integers (concatenate 'string result))))
-  (if (or (numberp (car input)) (has-operator (car input)))
-    (collect-integers (rest input) :results (cons (car input) results))
-    (collect-integers (rest input) :results results)))
+    (return-from check-list-for-integers nil))
+  (if (integerp (read-from-string(car input)))
+    (return-from check-list-for-integers T))
+  (check-list-for-integers (rest input)))
 
 
 ;; Checks if a given item is in a list
@@ -102,16 +102,17 @@
       T
       (check-if-in-list target (rest input)))))
 
-;; Check if a list contains integers
-(defun check-list-for-integers (input)
+;; Collects integer terms in a given list
+(defun collect-integers (input &key (results '()))
   (if (eql input nil)
-    (return-from check-list-for-integers nil))
-  (if (integerp (read-from-string(car input)))
-    (return-from check-list-for-integers T))
-  (check-list-for-integers (rest input)))
+    (let ((result (write-to-string(eval(reverse results)))))
+      (return-from collect-integers (concatenate 'string result))))
+  (if (or (numberp (car input)) (has-operator (car input)))
+    (collect-integers (rest input) :results (cons (car input) results))
+    (collect-integers (rest input) :results results)))
 
 
-;; Scansn through a given list looking for terms to be collected
+;; Scans through a given list looking for terms to be collected
 (defun collect-symbols (input &key (orig input) (scanned '()) (results '()))
   ;; If the list is empty then return from the function
   (if (eql input nil)
@@ -131,6 +132,7 @@
                            :scanned new-scanned 
                            :results new-results))))))
 
+
 ;; Loop through the list looking for nested expressions that can be simplyfied
 (defun find-nested (input &key (orig input))
   (if (eql input nil)
@@ -146,4 +148,4 @@
 
 
 (format t "~d~%" (collect-integers '(+ 1 2 3 4x 4y 5zy 100)))
-(format t "~d~%" (collect-symbols '(+ x 5x 7x 4y y y z z z)))
+(format t "~d~%" (collect-symbols '(+ 100z x 5x 7x 4y y y z z z)))
