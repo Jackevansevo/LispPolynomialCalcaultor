@@ -2,10 +2,10 @@
 
 ;; ARITHMETIC FUNCTIONS
 (defun poly+ (p1 p2)
-  (format t "Term 1: ~d~%" p1)
-  (scan-for-terms p1)
-  (format t "Term 2: ~d~%" p2 )
-  (scan-for-terms p2))
+  (format t "Passed arguments: ~d~%" p1)
+  (format t "Passed arguments: ~d~%" p2)
+  (find-nested p1)
+  (find-nested p2))
 
 
 ;;; Create interactive prompt to enter data
@@ -50,7 +50,10 @@
 
 
 ;; A bunch of shitty test cases
-; (main '(+ (+ (+ x x) (+ 5y y) (- 2y y)) (+ x y z)))
-; (main '(+ (+ (+ 5x x) (- 2x x)) (+ y y)))
-(main '(poly+ (+ x x) (+ y y)))
+(main '(poly+ (+ (+ x x) (- 5y y) (- 2y y)) (+ x y z)))
+; (main '(poly+ (+ (+ 5x x 4y y) (- 2x x)) (+ y y)))
+; (main '(poly+ (* 5x 2x) (+ y y)))
+; (main '(poly+ (+ x 5x 7x) (+ y y)))
+; (main '(poly+ (+ 1 2 3) (+ 2xy x z)))
+
 ; (main)
