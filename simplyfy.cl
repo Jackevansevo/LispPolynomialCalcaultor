@@ -5,7 +5,7 @@
     (if (has-operator input)
       (return-from get-sign-value input))
     ;; If the string doesn't contain any integers then just return 1
-    (if (not (has-integers string-input))
+    (if (not (string-has-integers string-input))
       1
       (parse-integer (strip-symbols string-input)))))
 
@@ -16,15 +16,20 @@
   (remove-if (lambda (ch) (find ch chars)) str))
 
 
-;; Loops through a string and looks for integers
-(defun has-integers (input)
+;; Returns true if a string contains integers
+(defun string-has-integers (input)
   ;; If the string is empty then quit
   (if (eql (length input) 0)
-      (return-from has-integers Nil))
+      (return-from string-has-integers Nil))
   (if (numberp (read-from-string(subseq input 0 1)))
-    (return-from has-integers T)
+    (return-from string-has-integers T)
     ;; Else check the next character in the string
-    (has-integers (subseq input 1 (length input)))))
+    (string-has-integers (subseq input 1 (length input)))))
+
+
+;; Returns true if a list contains intergers
+(defun list-has-integers (input)
+  (if (some 'integerp input) T Nil))
 
 
 ;; Strips all the symbols from the end of a given string
@@ -84,16 +89,7 @@
       (collect-terms target (rest input) :results results))))
 
 
-;; Check if a list contains integers
-(defun check-list-for-integers (input)
-  (if (eql input nil)
-    (return-from check-list-for-integers nil))
-  (if (integerp (read-from-string(car input)))
-    (return-from check-list-for-integers T))
-  (check-list-for-integers (rest input)))
-
-
-;; Checks if a given item is in a list
+;; Returns true if target can be found in list
 (defun check-if-in-list (target input)
   ;; If the input is empty then return false
   (if (eql input nil)
@@ -101,6 +97,7 @@
     (if (equal (car input) target)
       T
       (check-if-in-list target (rest input)))))
+
 
 ;; Collects integer terms in a given list
 (defun collect-integers (input &key (results '()))
@@ -119,8 +116,8 @@
     (return-from collect-symbols results))
   ;; Set a variable to track the current position in the list
   (let ((target (get-sign (car input))))
-    ;; We don't want to collect operators
-    (if (has-operator (car input))
+    ;; We don't want to collect operators or integers
+    (if (or(has-operator (car input)) (numberp (car input)))
       (collect-symbols (rest input) :scanned scanned :orig orig :results results)
       ;; Check if the symbol of the current position has been scanned
       (if (check-if-in-list target scanned)
@@ -137,15 +134,13 @@
 (defun find-nested (input &key (orig input))
   (if (eql input nil)
     (progn
-      (return-from find-nested (collect-symbols orig))))
+      (return-from find-nested nil)))
   ;; Check if current position is a nested list
   (if (listp (car input))
     (progn
-      (format t "~%Simplyfying: ~d~%" (car input))
-      (collect-symbols (car input))))
+      (format t "~%Found nested ~d~%" (car input))
+      (format t "Collected symbols: ~d~%" (collect-symbols (car input)))
+      (if (list-has-integers (car input))
+        (format t "Collected integers ~d~%" (collect-integers (car input))))))
   ;; Loop through the rest of the list and check for nested lists
   (find-nested (rest input) :orig orig))
-
-
-(format t "~d~%" (collect-integers '(+ 1 2 3 4x 4y 5zy 100)))
-(format t "~d~%" (collect-symbols '(+ 100z x 5x 7x 4y y y z z z)))
