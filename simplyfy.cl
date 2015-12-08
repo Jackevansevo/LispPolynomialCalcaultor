@@ -1,49 +1,22 @@
-;; Returns the integer value in-front of a artihmetic sign
-(defun get-sign-value (input)
-  (let ((string-input (strip-chars (write-to-string input) "|")))
-    ;; If it's an operator then just return it's value
-    (if (has-operator input)
-      (return-from get-sign-value input))
-    ;; If the string doesn't contain any integers then just return 1
-    (if (not (string-has-integers string-input))
-      1
-      (parse-integer (strip-symbols string-input)))))
-
-
-;; Strip characters from a string
-;; http://rosettacode.org/wiki/Strip_a_set_of_characters_from_a_string#Common_Lisp
-(defun strip-chars (str chars)
-  (remove-if (lambda (ch) (find ch chars)) str))
-
-
-;; Returns true if a string contains integers
-(defun string-has-integers (input)
-  ;; If the string is empty then quit
-  (if (eql (length input) 0)
-      (return-from string-has-integers Nil))
-  (if (numberp (read-from-string(subseq input 0 1)))
-    (return-from string-has-integers T)
-    ;; Else check the next character in the string
-    (string-has-integers (subseq input 1 (length input)))))
-
-
-;; Returns true if a list contains intergers
-(defun list-has-integers (input)
-  (if (some 'integerp input) T Nil))
-
-
-;; Strips all the symbols from the end of a given string
-(defun strip-symbols (input)
-  (let ((start 0)
-        (end (get-last-integer-position input)))
-    (return-from strip-symbols (subseq input start end))))
-
-
 ;; Strips all the integers from the start of a given string
-(defun strip-integers (input)
-  (let ((start (get-last-integer-position input))
-        (end (length input)))
-    (return-from strip-integers (subseq input start end))))
+(defun strip-chars (target input)
+  (string-trim target input))
+
+
+;; Returns true if input string can be found in list of target strings
+(defun check-if-strings-equal (input targets)
+  ;; If targets is empty return false
+  (if (eql targets nil) 
+    nil
+    ;; Check if string is equal to current position in target
+    (if (string-equal input (car targets))
+      T  (check-if-strings-equal input (rest targets)))))
+
+
+; Checks to see if given input contains an arithmetic symbol
+(defun is-operator (input)
+  (if (check-if-strings-equal (write-to-string input) '(+ - * expt))
+    T nil))
 
 
 ;; Returns the position of the last integer within a list
@@ -54,39 +27,47 @@
     (get-last-integer-position (subseq input 1 (length input)) :pos (+ pos 1)))
 
 
+;; Returns true if a string contains integers
+(defun string-has-integers (input)
+  ;; If the string is empty then quit
+  (if (string-equal input "")
+    nil
+    (if (numberp (read-from-string(subseq input 0 1)))
+      (return-from string-has-integers T)
+      ;; Else check the next character in the string
+      (string-has-integers (subseq input 1 (length input))))))
+
+
+;; Strips all the symbols from the end of a given string
+(defun strip-symbols (input)
+  (if (and(eql (length input) 1) (string-has-integers input))
+    input
+    (let ((start 0)
+          (end (get-last-integer-position input)))
+      (return-from strip-symbols (subseq input start end)))))
+
+
+;; Returns the integer value in-front of a artihmetic sign
+(defun get-sign-value (input)
+  (let ((string-input (strip-chars "|" (write-to-string input))))
+    ;; If it's an operator then just return it's value
+    (if (is-operator input) input
+      ;; If there's intergers infront e.g. '50xy' strip them and return the
+      ;; value, else just return 1, e.g. for 'y'
+      (if (string-has-integers string-input)
+        (parse-integer (strip-symbols string-input)) 1))))
+
+
+;; Returns true if a list contains intergers
+(defun list-has-integers (input)
+  (if (some 'integerp input) T Nil))
+
+
 ;; Returns the sign of a given input value
 (defun get-sign (input)
-  (if (eql (length (write-to-string input))1)
-    (return-from get-sign (write-to-string input))
-    ;; Convert the input to a string and strip off annoying '|' characters
-    (strip-integers (strip-chars (write-to-string input) "|"))))
-
-
-;; Checks to see if given input contains an arithmetic symbol
-(defun has-operator (input)
-  (if (check-if-strings-equal (write-to-string input) '(+ - * expt))
-    T nil))
-
-
-;; Checks if an input string is equal to a number of other strings
-(defun check-if-strings-equal (input vals)
-  ;; If vals is empty return false
-  (if (eql vals nil) (return-from check-if-strings-equal nil))
-  ;; If yes return true else recursively call the function
-  (if (string-equal input (car vals))
-    T  (check-if-strings-equal input (rest vals))))
-
-
-;; Collects terms of a specific target in a given list
-(defun collect-terms (target input &key (results '()))
-  (if (eql input nil)
-    (let ((result (write-to-string(eval(reverse results)))))
-      (return-from collect-terms (concatenate 'string result target))))
-  (let ((currentPos (car input)))
-    ;; Check if the current position is an operator
-    (if (or (has-operator currentPos) (string-equal target (get-sign currentPos)))
-      (collect-terms target (rest input) :results (cons (get-sign-value currentPos) results))
-      (collect-terms target (rest input) :results results))))
+  (if (numberp input)
+    nil
+    (strip-chars "0123456789|" (write-to-string input))))
 
 
 ;; Returns true if target can be found in list
@@ -99,12 +80,27 @@
       (check-if-in-list target (rest input)))))
 
 
+;; Collects terms of a specific target in a given list
+(defun collect-terms (target input &key (results '()))
+  (if (string-has-integers target)
+    (return-from collect-terms nil))
+  (if (eql input nil)
+    (let ((result (write-to-string(eval(reverse results)))))
+      (if (string-equal result "1") (return-from collect-terms target)
+        (return-from collect-terms (concatenate 'string result target)))))
+  (let ((currentPos (car input)))
+    ;; Check if the current position is an operator
+    (if (or (is-operator currentPos) (string-equal target (get-sign currentPos)))
+      (collect-terms target (rest input) :results (cons (get-sign-value currentPos) results))
+      (collect-terms target (rest input) :results results))))
+
+
 ;; Collects integer terms in a given list
 (defun collect-integers (input &key (results '()))
   (if (eql input nil)
     (let ((result (write-to-string(eval(reverse results)))))
       (return-from collect-integers (concatenate 'string result))))
-  (if (or (numberp (car input)) (has-operator (car input)))
+  (if (or (numberp (car input)) (is-operator (car input)))
     (collect-integers (rest input) :results (cons (car input) results))
     (collect-integers (rest input) :results results)))
 
@@ -116,8 +112,8 @@
     (return-from collect-symbols results))
   ;; Set a variable to track the current position in the list
   (let ((target (get-sign (car input))))
-    ;; We don't want to collect operators or integers
-    (if (or(has-operator (car input)) (numberp (car input)))
+    ;; We don't want to collect operators
+    (if (is-operator (car input))
       (collect-symbols (rest input) :scanned scanned :orig orig :results results)
       ;; Check if the symbol of the current position has been scanned
       (if (check-if-in-list target scanned)
