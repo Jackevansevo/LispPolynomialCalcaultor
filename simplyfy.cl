@@ -6,7 +6,7 @@
 ;; Returns true if input string can be found in list of target strings
 (defun check-if-strings-equal (input targets)
   ;; If targets is empty return false
-  (if (eql targets nil) 
+  (if (eql targets nil)
     nil
     ;; Check if string is equal to current position in target
     (if (string-equal input (car targets))
@@ -106,40 +106,44 @@
     (collect-integers (rest input) :results results)))
 
 
+(defun flatten (obj)
+  (if (listp obj) (mapcan #'flatten obj) (list obj)))
+
+
 ;; Returns a simplyfied version of the polynomial expression
-(defun simplyfy (input &key (orig input) (scanned '()) (results '()))
+(defun simplyfy-term (input &key (orig input) (scanned '()) (results '()))
   (if (eql input nil)
     results
-  (cond
-    ;; If it's an integer
-    ((integerp (car input))
-     (if (not(list-has-integers scanned))
-       (let ((new-results (append results (list(collect-integers orig))))
-             (new-scanned (append scanned (list(car input)))))
-         (simplyfy (rest input) :scanned new-scanned :orig orig :results new-results))
-       (simplyfy (rest input) :scanned scanned :orig orig :results results)))
-    ;; If it's a number with a symbol
-    ((not (eql (get-sign-value (car input)) nil))
-     (if (not (is-operator (car input)))
-       (if (not(check-if-in-list (get-sign (car input)) scanned))
-         (let ((new-results (append results (list(collect-terms (get-sign (car input)) orig))))
-               (new-scanned (append scanned (list(get-sign (car input))))))
-           (simplyfy (rest input) :scanned new-scanned :orig orig :results new-results))
-         (simplyfy (rest input) :scanned scanned :orig orig :results results))
-       (simplyfy (rest input) :scanned scanned :orig orig :results results))))))
+    (cond
+      ;; If it's not a list
+      ((not (listp input))
+       (return-from simplyfy-term input))
+      ;; If it's an integer
+      ((integerp (car input))
+       (if (not(list-has-integers scanned))
+         (let ((new-results (append results (list(collect-integers orig))))
+               (new-scanned (append scanned (list(car input)))))
+           (simplyfy-term (rest input) :scanned new-scanned :orig orig :results new-results))
+         (simplyfy-term (rest input) :scanned scanned :orig orig :results results)))
+      ;; If it's a number with a symbol
+      ((not (eql (get-sign-value (car input)) nil))
+       (if (not (is-operator (car input)))
+         (if (not(check-if-in-list (get-sign (car input)) scanned))
+           (let ((new-results (append results (list(collect-terms (get-sign (car input)) orig))))
+                 (new-scanned (append scanned (list(get-sign (car input))))))
+             (simplyfy-term (rest input) :scanned new-scanned :orig orig :results new-results))
+           (simplyfy-term (rest input) :scanned scanned :orig orig :results results))
+         (simplyfy-term (rest input) :scanned scanned :orig orig :results results))))))
 
 
-;; Loop through the list looking for nested expressions that can be simplyfied
-(defun find-nested (input &key (orig input))
-  (if (eql input nil)
-    (progn
-      (return-from find-nested nil)))
-  ;; Check if current position is a nested list
-  (if (listp (car input))
-    (progn
-      (format t "~%Found nested ~d~%" (car input))
-      (format t "Collected symbols: ~d~%" (simplyfy (car input)))
-      (if (list-has-integers (car input))
-        (format t "Collected integers ~d~%" (collect-integers (car input))))))
-  ;; Loop through the rest of the list and check for nested lists
-  (find-nested (rest input) :orig orig))
+;; Returns true if a list contains nested elements
+(defun has-nested (input)
+  (if (some #'listp input) T nil))
+
+
+;; Iterates through simplyfying each term in an expression
+(defun simplyfy (input)
+  (format t "Passed input: ~d~%" input)
+  (if (has-nested input)
+    (flatten(map 'list #'(lambda (x) (simplyfy-term x)) input))
+    (simplyfy-term input)))
