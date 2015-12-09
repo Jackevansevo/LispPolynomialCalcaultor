@@ -17,34 +17,34 @@
       (get-last-int-pos (subseq input 1 (length input)) :pos (+ pos 1)))))
 
 
-;; Returns true if a string contains integers
-(defun string-has-integers (input)
-  ;; If the string is empty then quit
-  (if (string-equal input "")
-    nil
-    (if (numberp (read-from-string(subseq input 0 1)))
-      (return-from string-has-integers T)
-      ;; Else check the next character in the string
-      (string-has-integers (subseq input 1 (length input))))))
-
-
 ;; Strips all the symbols from the end of a given string
 (defun strip-symbols (input)
-  (if (and(eql (length input) 1) (string-has-integers input))
+  (if (and(eql (length input) 1) (has-integers input))
     input
     (let ((start 0)
           (end (get-last-int-pos input)))
       (return-from strip-symbols (subseq input start end)))))
 
 
-;; Returns the integer value in-front of a artihmetic sign
+;; Returns true if input contains integers
+(defun has-integers (input)
+  (if (integerp input)
+    T
+    (find T (map 'list #'check-if-integer (string input)))))
+
+
+;; Returns true if character is an integer
+(defun check-if-integer (input)
+  (if (integerp (digit-char-p input)) T NIl))
+
+
+;; Returns the integer value in-front of an arithmetic sign
 (defun get-sign-value (input)
-  (let ((string-input (strip-chars "|" (write-to-string input))))
-    ;; If it's an operator then just return it's value
-    (if (is-operator input) input
-      ;; If there's intergers infront strip them and return the value
-      (if (string-has-integers string-input)
-        (parse-integer (strip-symbols string-input)) 1))))
+  (cond
+    ((is-operator input) nil)
+    ((integerp input) input)
+    (t (if (has-integers input)
+         (parse-integer (strip-symbols (string input))) 1))))
 
 
 ;; Returns true if a list contains intergers
