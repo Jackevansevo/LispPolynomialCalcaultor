@@ -3,20 +3,9 @@
   (string-trim target input))
 
 
-;; Returns true if input string can be found in list of target strings
-(defun check-if-strings-equal (input targets)
-  ;; If targets is empty return false
-  (if (eql targets nil)
-    nil
-    ;; Check if string is equal to current position in target
-    (if (string-equal input (car targets))
-      T  (check-if-strings-equal input (rest targets)))))
-
-
-; Checks to see if given input contains an arithmetic symbol
+;; Checks to see if given input contains an arithmetic symbol
 (defun is-operator (input)
-  (if (check-if-strings-equal (write-to-string input) '(+ - * expt))
-    T nil))
+  (if (member input '(+ - *)) T nil))
 
 
 (defun get-last-int-pos (input &key (pos 0))
@@ -97,12 +86,6 @@
       (get-sign-value input))))
 
 
-;; Evaluates whether terms should be collected or not
-(defun term-collect? (term input)
-  (format t "Input ~d~%" input)
-  (format t "Term ~d~%" input))
-
-
 ;; Collects integer terms in a given list
 (defun collect-integers (input)
   (eval(remove nil(map 'list #'integer-collect? input))))
@@ -117,8 +100,7 @@
   (if (listp obj) (mapcan #'flatten obj) (list obj)))
 
 
-;; Do I date try to rewrite this using maps and lambdas lol
-
+;; [TODO] Rewrite this using lambdas
 ;; Returns a simplyfied version of the polynomial expression
 (defun simplyfy-term (input &key (orig input) (scanned '()) (results '()))
   (if (eql input nil)
@@ -152,9 +134,6 @@
 
 ;; Iterates through simplyfying each term in an expression
 (defun simplyfy (input)
-  (format t "Passed input: ~d~%" input)
   (if (has-nested input)
     (flatten(map 'list #'(lambda (x) (simplyfy-term x)) input))
     (simplyfy-term input)))
-
-(format t "~d~%" (collect-terms "2x" '(+ x x x y z)))
