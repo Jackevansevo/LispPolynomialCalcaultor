@@ -85,8 +85,8 @@
 (defun collect-terms (term input)
   (let ((result (eval (remove nil(map 'list (make-term-collect term) input)))))
     (case result
-      (0 nil)               ;; If result is 0 return nil
-      (1 term)              ;; If result is 1 return just the term
+      (0 nil)           ;; If result is 0 return nil
+      (1 term)          ;; If result is 1 return just the term
       (otherwise
         (concatenate 'string (write-to-string result) term)))))
 
