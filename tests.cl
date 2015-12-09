@@ -1,7 +1,7 @@
 (require "simplyfy.cl")
 
 (defun report-result (result form)
-  (format t "~:[FAIL~;pass~] ... ~a~%" result form)
+  (format t "~:[~c[31mFAIL~;~c[32mPASS~] ~c[0m ... ~a~%" result #\ESC #\ESC form)
   result)
 
 (defmacro check (&body forms)
@@ -15,15 +15,16 @@
     (eql (get-sign-value 'x) 1)
     (eql (get-sign-value '5x) 5)
     (eql (get-sign-value '10x) 10)
-    (eql (get-sign-value '200xy) 200)))
+    (eql (get-sign-value '200xy) 200)
+    (eql (get-sign-value '5) 5)))
 
 
 ;; Tests for (strip-chars)
 (defun test-strip-chars ()
   (check
-    (string-equal (strip-chars "|xy|" "|") "xy")
-    (string-equal (strip-chars "Hello world" "H") "ello world")
-    (string-equal (strip-chars "test" "est") "")))
+    (string-equal (strip-chars "|" "xy") "xy")
+    (string-equal (strip-chars "H" "Hello world") "ello world")
+    (string-equal (strip-chars "est" "test") "")))
 
 
 ;; Tests for (strip-symbols)
@@ -52,6 +53,17 @@
     (eql (list-has-integers '(x y 1)) T)
     (eql (list-has-integers '(x y 50y)) nil)
     (eql (list-has-integers '(x y z)) nil)))
+
+
+;; Tests for (get-last-integer-position)
+(defun test-get-last-integer-position ()
+  (check
+    (eql (get-last-integer-position "5y") 1)
+    (eql (get-last-integer-position "50y") 2)
+    (eql (get-last-integer-position "500xy") 3)
+    (eql (get-last-integer-position "x") 0)
+    (eql (get-last-integer-position "xy") 0)
+    (eql (get-last-integer-position "1") nil)))
 
 
 ;; Tests for (collect-terms)
@@ -116,3 +128,8 @@
 (format t "Testing is-operator~%")
 (test-is-operator)
 (terpri)
+
+(format t "Testing get-last-integer-position~%")
+(test-get-last-integer-position)
+(terpri)
+
