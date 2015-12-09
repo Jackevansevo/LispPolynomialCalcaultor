@@ -10,7 +10,7 @@
 
 (defun get-last-int-pos (input &key (pos 0))
   ;; Find the first position that isn't a number and return the position
-  (if (and (numberp (read-from-string input) ) (eql pos 0))
+  (if (and (numberp (read-from-string input)) (eql pos 0))
     nil
     (if (not(numberp (read-from-string(subseq input 0 1))))
       (return-from get-last-int-pos pos)
@@ -41,7 +41,7 @@
 ;; Returns the integer value in-front of an arithmetic sign
 (defun get-sign-value (input)
   (cond
-    ((is-operator input) nil)
+    ((is-operator input) input)
     ((integerp input) input)
     (t (if (has-integers input)
          (parse-integer (strip-symbols (string input))) 1))))
