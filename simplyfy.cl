@@ -1,6 +1,6 @@
-;; Strips all the integers from the start of a given string
+;; Strips all the integers from a symbol
 (defun strip-chars (target input)
-  (string-trim target input))
+  (intern(string-trim target (write-to-string input))))
 
 
 ;; Checks to see if given input contains an arithmetic symbol
@@ -56,7 +56,7 @@
 (defun get-sign (input)
   (if (numberp input)
     nil
-    (strip-chars "0123456789|" (write-to-string input))))
+    (strip-chars "0123456789|" input)))
 
 
 ;; Returns true if target can be found in list
@@ -76,7 +76,7 @@
       (0 nil)           ;; If result is 0 return nil
       (1 term)          ;; If result is 1 return just the term
       (otherwise
-        (concatenate 'string (write-to-string result) term)))))
+        (concatenate 'string (write-to-string result) (string term))))))
 
 
 ;; Returns a closure that collects terms
@@ -94,6 +94,7 @@
 ;; Returns true if x is an integer or an operator
 (defun integer-collect?(x)
   (if (or (numberp x) (is-operator x)) x))
+
 
 ;; Flattens a given list
 (defun flatten (obj)
