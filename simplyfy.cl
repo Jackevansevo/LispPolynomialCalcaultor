@@ -84,13 +84,17 @@
 ;; Collects terms within a given list
 (defun collect-terms (term input)
   (let ((result (eval (remove nil(map 'list (make-term-collect term) input)))))
-    (concatenate 'string (write-to-string result) term)))
+    (case result
+      (0 nil)
+      (1 term)
+      (otherwise
+        (concatenate 'string (write-to-string result) term)))))
 
 
 ;; Returns a closure that collects terms
 (defun make-term-collect (term)
-  (lambda (input) 
-    (if (or (is-operator input) (string-equal term (get-sign input))) 
+  (lambda (input)
+    (if (or (is-operator input) (string-equal term (get-sign input)))
       (get-sign-value input))))
 
 
@@ -154,6 +158,4 @@
     (flatten(map 'list #'(lambda (x) (simplyfy-term x)) input))
     (simplyfy-term input)))
 
-(format t "~d~%" (collect-terms "x" '(+ 5x x y 1 2)))
-(format t "~d~%" (collect-terms "x" '(+ x x x)))
-(format t "~d~%" (collect-terms "yx" '(+ x 5yx 5yx)))
+(format t "~d~%" (collect-terms "2x" '(+ x x x y z)))
