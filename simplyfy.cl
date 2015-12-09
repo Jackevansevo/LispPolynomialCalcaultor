@@ -53,8 +53,7 @@
   (let ((string-input (strip-chars "|" (write-to-string input))))
     ;; If it's an operator then just return it's value
     (if (is-operator input) input
-      ;; If there's intergers infront e.g. '50xy' strip them and return the
-      ;; value, else just return 1, e.g. for 'y'
+      ;; If there's intergers infront strip them and return the value
       (if (string-has-integers string-input)
         (parse-integer (strip-symbols string-input)) 1))))
 
