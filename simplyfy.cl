@@ -19,13 +19,13 @@
     T nil))
 
 
-(defun get-last-integer-position (input &key (pos 0))
+(defun get-last-int-pos (input &key (pos 0))
   ;; Find the first position that isn't a number and return the position
   (if (and (numberp (read-from-string input) ) (eql pos 0))
     nil
     (if (not(numberp (read-from-string(subseq input 0 1))))
-      (return-from get-last-integer-position pos)
-      (get-last-integer-position (subseq input 1 (length input)) :pos (+ pos 1)))))
+      (return-from get-last-int-pos pos)
+      (get-last-int-pos (subseq input 1 (length input)) :pos (+ pos 1)))))
 
 
 ;; Returns true if a string contains integers
@@ -44,7 +44,7 @@
   (if (and(eql (length input) 1) (string-has-integers input))
     input
     (let ((start 0)
-          (end (get-last-integer-position input)))
+          (end (get-last-int-pos input)))
       (return-from strip-symbols (subseq input start end)))))
 
 
@@ -81,34 +81,38 @@
       (check-if-in-list target (rest input)))))
 
 
-;; Collects terms of a specific target in a given list
-(defun collect-terms (target input &key (results '()))
-  (if (string-has-integers target)
-    (return-from collect-terms nil))
-  (if (eql input nil)
-    (let ((result (write-to-string(eval(reverse results)))))
-      (if (string-equal result "1") (return-from collect-terms target)
-        (return-from collect-terms (concatenate 'string result target)))))
-  (let ((currentPos (car input)))
-    ;; Check if the current position is an operator
-    (if (or (is-operator currentPos) (string-equal target (get-sign currentPos)))
-      (collect-terms target (rest input) :results (cons (get-sign-value currentPos) results))
-      (collect-terms target (rest input) :results results))))
+;; Collects terms within a given list
+(defun collect-terms (term input)
+  (eval (remove nil(map 'list (make-term-collect term) input))))
+
+;; Returns a closure that collects terms
+(defun make-term-collect (term)
+  (lambda (input) 
+    (if (or (is-operator input) (string-equal term (get-sign input))) 
+      (get-sign-value input))))
+
+
+;; Evaluates whether terms should be collected or not
+(defun term-collect? (term input)
+  (format t "Input ~d~%" input)
+  (format t "Term ~d~%" input))
 
 
 ;; Collects integer terms in a given list
-(defun collect-integers (input &key (results '()))
-  (if (eql input nil)
-    (let ((result (write-to-string(eval(reverse results)))))
-      (return-from collect-integers (concatenate 'string result))))
-  (if (or (numberp (car input)) (is-operator (car input)))
-    (collect-integers (rest input) :results (cons (car input) results))
-    (collect-integers (rest input) :results results)))
+(defun collect-integers (input)
+  (remove nil(map 'list #'integer-collect? input)))
 
 
+;; Returns true if x is an integer or an operator
+(defun integer-collect?(x)
+  (if (or (numberp x) (is-operator x)) x))
+
+;; Flattens a given list
 (defun flatten (obj)
   (if (listp obj) (mapcan #'flatten obj) (list obj)))
 
+
+;; Do I date try to rewrite this using maps and lambdas lol
 
 ;; Returns a simplyfied version of the polynomial expression
 (defun simplyfy-term (input &key (orig input) (scanned '()) (results '()))
@@ -147,3 +151,7 @@
   (if (has-nested input)
     (flatten(map 'list #'(lambda (x) (simplyfy-term x)) input))
     (simplyfy-term input)))
+
+(format t "~d~%" (collect-terms "x" '(+ 5x x y 1 2)))
+(format t "~d~%" (collect-terms "x" '(+ x x x)))
+(format t "~d~%" (collect-terms "yx" '(+ x 5yx 5yx)))
