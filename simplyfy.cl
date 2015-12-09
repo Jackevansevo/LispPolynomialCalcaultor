@@ -83,7 +83,9 @@
 
 ;; Collects terms within a given list
 (defun collect-terms (term input)
-  (eval (remove nil(map 'list (make-term-collect term) input))))
+  (let ((result (eval (remove nil(map 'list (make-term-collect term) input)))))
+    (concatenate 'string (write-to-string result) term)))
+
 
 ;; Returns a closure that collects terms
 (defun make-term-collect (term)
@@ -100,7 +102,7 @@
 
 ;; Collects integer terms in a given list
 (defun collect-integers (input)
-  (remove nil(map 'list #'integer-collect? input)))
+  (eval(remove nil(map 'list #'integer-collect? input))))
 
 
 ;; Returns true if x is an integer or an operator
