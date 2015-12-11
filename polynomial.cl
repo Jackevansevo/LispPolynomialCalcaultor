@@ -1,11 +1,13 @@
 (require "simplyfy.cl")
 
 ;; ARITHMETIC FUNCTIONS
+
+;; Adds together two polynomials
 (defun poly+ (p1 p2 &key (result '(+)))
   (let ((p1 (simplyfy p1))
         (p2 (simplyfy p2)))
-    (format t "~d~%" p1)
-    (format t "~d~%" p2)))
+    (let ((result (append '(+)(simplyfy(append '(+) p1 p2)))))
+      result)))
 
 
 ;;; Create interactive prompt to enter data
@@ -50,10 +52,5 @@
 
 
 ;; A bunch of shitty test cases
-; (main '(poly+ (+ (+ x x x x x x x 5x) (- 5y y) (- 2y y 5 10)) (+ y y)))
-; (main '(poly+ (+ (+ 5x x 4y y) (- 2x x)) (+ y y)))
-; (main '(poly+ (* 5x 2x) (+ y y)))
-; (main '(poly+ (+ x 5x 100y 1 2) (+ y y)))
-(main '(poly+ (+ 1 2 3) (+ 2xy x z)))
-
+(format t "~d~%" (poly+ '(+ 2z z 5x 1 2 3) (poly+ '(+ 2x x) '(+ 2y y))))
 ; (main)
