@@ -1,29 +1,11 @@
 ;; Strips all the integers from a symbol
 (defun strip-chars (target input)
-  (intern(string-trim target (write-to-string input))))
+  (string-trim target (write-to-string input)))
 
 
 ;; Checks to see if given input contains an arithmetic symbol
 (defun is-operator (input)
   (if (member input '(+ - *)) T nil))
-
-
-(defun get-last-int-pos (input &key (pos 0))
-  ;; Find the first position that isn't a number and return the position
-  (if (and (numberp (read-from-string input)) (eql pos 0))
-    nil
-    (if (not(numberp (read-from-string(subseq input 0 1))))
-      (return-from get-last-int-pos pos)
-      (get-last-int-pos (subseq input 1 (length input)) :pos (+ pos 1)))))
-
-
-;; Strips all the symbols from the end of a given string
-(defun strip-symbols (input)
-  (if (and(eql (length input) 1) (has-integers input))
-    input
-    (let ((start 0)
-          (end (get-last-int-pos input)))
-      (return-from strip-symbols (subseq input start end)))))
 
 
 ;; Returns true if input contains integers
@@ -38,13 +20,12 @@
   (if (integerp (digit-char-p input)) T NIl))
 
 
-;; Returns the integer value in-front of an arithmetic sign
-(defun get-sign-value (input)
-  (cond
-    ((is-operator input) input)
-    ((integerp input) input)
-    (t (if (has-integers input)
-         (parse-integer (strip-symbols (string input))) 1))))
+;; Returns the value of a sign
+(defun sign-value (input)
+  (if (or (is-operator input) (integerp input)) input
+    (if (has-integers input)
+      (let ((x (concatenate 'string (write-to-string (sign-of input)) "|")))
+        (parse-integer(strip-chars x input))) 1)))
 
 
 ;; Returns true if a list contains intergers
@@ -52,11 +33,11 @@
   (if (some 'integerp input) T Nil))
 
 
-;; Returns the sign of a given input value
-(defun get-sign (input)
+;; Returns the sign-of of a given input value
+(defun sign-of (input)
   (if (numberp input)
     nil
-    (strip-chars "0123456789|" input)))
+    (intern(strip-chars "0123456789|" input))))
 
 
 ;; Returns true if target can be found in list
@@ -76,14 +57,14 @@
       (0 nil)           ;; If result is 0 return nil
       (1 term)          ;; If result is 1 return just the term
       (otherwise
-        (concatenate 'string (write-to-string result) (string term))))))
+        (intern(concatenate 'string (write-to-string result) (string term)))))))
 
 
 ;; Returns a closure that collects terms
 (defun make-term-collect (term)
   (lambda (input)
-    (if (or (is-operator input) (string-equal term (get-sign input)))
-      (get-sign-value input))))
+    (if (or (is-operator input) (string-equal term (sign-of input)))
+      (sign-value input))))
 
 
 ;; Collects integer terms in a given list
@@ -101,7 +82,7 @@
   (if (listp obj) (mapcan #'flatten obj) (list obj)))
 
 
-;; [TODO] Rewrite this using lambdas
+;; [TODO] If I had time I'd rewrite this using lambda expressions
 ;; Returns a simplyfied version of the polynomial expression
 (defun simplyfy-term (input &key (orig input) (scanned '()) (results '()))
   (if (eql input nil)
@@ -118,11 +99,11 @@
            (simplyfy-term (rest input) :scanned new-scanned :orig orig :results new-results))
          (simplyfy-term (rest input) :scanned scanned :orig orig :results results)))
       ;; If it's a number with a symbol
-      ((not (eql (get-sign-value (car input)) nil))
+      ((not (eql (sign-value (car input)) nil))
        (if (not (is-operator (car input)))
-         (if (not(check-if-in-list (get-sign (car input)) scanned))
-           (let ((new-results (append results (list(collect-terms (get-sign (car input)) orig))))
-                 (new-scanned (append scanned (list(get-sign (car input))))))
+         (if (not(check-if-in-list (sign-of (car input)) scanned))
+           (let ((new-results (append results (list(collect-terms (sign-of (car input)) orig))))
+                 (new-scanned (append scanned (list(sign-of (car input))))))
              (simplyfy-term (rest input) :scanned new-scanned :orig orig :results new-results))
            (simplyfy-term (rest input) :scanned scanned :orig orig :results results))
          (simplyfy-term (rest input) :scanned scanned :orig orig :results results))))))
@@ -136,5 +117,5 @@
 ;; Iterates through simplyfying each term in an expression
 (defun simplyfy (input)
   (if (has-nested input)
-    (flatten(map 'list #'(lambda (x) (simplyfy-term x)) input))
+    (simplyfy(flatten(map 'list #'(lambda (x) (simplyfy-term x)) input)))
     (simplyfy-term input)))
