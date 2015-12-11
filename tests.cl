@@ -9,82 +9,14 @@
      ,@(loop for f in forms collect `(report-result ,f ',f))))
 
 
-;; Tests for (get-sign-value)
-(defun test-get-sign-value ()
-  (check
-    (eql (get-sign-value 'x) 1)
-    (eql (get-sign-value '5x) 5)
-    (eql (get-sign-value '10x) 10)
-    (eql (get-sign-value '200xy) 200)
-    (eql (get-sign-value '5) 5)))
-
-
 ;; Tests for (strip-chars)
 (defun test-strip-chars ()
   (check
-    (string-equal (strip-chars "|" "xy") "xy")
-    (string-equal (strip-chars "H" "Hello world") "ello world")
-    (string-equal (strip-chars "est" "test") "")))
-
-
-;; Tests for (strip-symbols)
-(defun test-strip-symbols ()
-  (check
-    (string-equal (strip-symbols "5x") "5")
-    (string-equal (strip-symbols "5xy") "5")
-    (string-equal (strip-symbols "5") "5")
-    (string-equal (strip-symbols "xy") "")))
-
-
-;; Tests for (string-has-integers)
-(defun test-string-has-integers ()
-  (check
-    (eql (string-has-integers "1") T)
-    (eql (string-has-integers "2x")T)
-    (eql (string-has-integers "20x") T)
-    (eql (string-has-integers "x") nil)))
-
-
-;; Tests for (list-has-integers)
-(defun test-list-has-integers ()
-  (check
-    (eql (list-has-integers '(1 2 3)) T)
-    (eql (list-has-integers '(x y 1)) T)
-    (eql (list-has-integers '(x y 1)) T)
-    (eql (list-has-integers '(x y 50y)) nil)
-    (eql (list-has-integers '(x y z)) nil)))
-
-
-;; Tests for (get-last-integer-position)
-(defun test-get-last-integer-position ()
-  (check
-    (eql (get-last-integer-position "5y") 1)
-    (eql (get-last-integer-position "50y") 2)
-    (eql (get-last-integer-position "500xy") 3)
-    (eql (get-last-integer-position "x") 0)
-    (eql (get-last-integer-position "xy") 0)
-    (eql (get-last-integer-position "1") nil)))
-
-
-;; Tests for (collect-terms)
-(defun test-collect-terms ()
-  (check
-      (string-equal (collect-terms "x" '(+ x x x) ) "3X")
-      (string-equal (collect-terms "x" '(+ x y z) ) "X")
-      (string-equal (collect-terms "XX" '(- 2xx xx) ) "XX")
-      (string-equal (collect-terms "y" '(- 2y 2y 2y)) "-2y")
-      (string-equal (collect-terms "yx" '(+ x 5yx 5yx)) "10yx")
-      (string-equal (collect-terms "y" '(- 2y y 5 10)) "Y")
-      (string-equal (collect-terms "2x" '(+ x x y)) nil)))
-
-
-;; Tests for (get-sign)
-(defun test-get-sign ()
-  (check
-    (string-equal (get-sign 'x) "X")
-    (string-equal (get-sign 'xy) "XY")
-    (string-equal (get-sign '5x) "X")
-    (string-equal (get-sign '200xy) "XY")))
+    (string-equal (strip-chars "1234567890|" '+) '+)
+    (string-equal (strip-chars "1234567890|" 'x) 'x)
+    (string-equal (strip-chars "1234567890|" '100y) 'y)
+    (string-equal (strip-chars "1234567890|" '200xy) 'xy)
+    (string-equal (strip-chars "1234567890|" 'y) 'y)))
 
 
 ;; Tests for (is-operator)
@@ -95,41 +27,100 @@
     (eql (is-operator '*) T)
     (eql (is-operator '20) nil)))
 
+;; Tests for (sign-value)
+(defun test-sign-value ()
+  (check
+    (eql (sign-value 'x) 1)
+    (eql (sign-value '5x) 5)
+    (eql (sign-value '10x) 10)
+    (eql (sign-value '200xy) 200)
+    (eql (sign-value '5) 5)))
 
-;; All tests are ran below
-(format t "Testing has get-sign-value~%")
-(test-get-sign-value)
-(terpri)
+;; Tests for (sign-of)
+(defun test-sign-of ()
+  (check
+    (string-equal (sign-of 'x) "X")
+    (string-equal (sign-of 'xy) "XY")
+    (string-equal (sign-of '5x) "X")
+    (string-equal (sign-of '200xy) "XY")))
 
-(format t "Testing strip-chars~%")
+;; Tests for (has-integers?)
+(defun test-has-integers? ()
+  (check
+    (eql (has-integers? '+) nil)
+    (eql (has-integers? 'x) nil)
+    (eql (has-integers? '5x) T)
+    (eql (has-integers? '100xy) T)
+    (eql (has-integers? '-) nil)))
+
+;; Tests for (list-has-integers?)
+(defun test-list-has-integers? ()
+  (check
+    (eql (list-has-integers? '(1 2 3)) T)
+    (eql (list-has-integers? '(x y 1)) T)
+    (eql (list-has-integers? '(x y 1)) T)
+    (eql (list-has-integers? '(x y 50y)) nil)
+    (eql (list-has-integers? '(x y z)) nil)))
+
+;; Tests for (test-is-in-list)
+(defun test-is-in-list? ()
+  (check
+    (eql (is-in-list? 1 '(1 2 3)) T)
+    (eql (is-in-list? '5xy '(5xy 2 3)) T)
+    (eql (is-in-list? 0 '(1 2 3)) nil)
+    (eql (is-in-list? '+ '(+ 1 2 3)) T)))
+
+;; Tests for (collect-terms)
+(defun test-collect-terms ()
+  (check
+      (eql (collect-terms 'x '(+ x x x) ) '3x)
+      (eql (collect-terms 'x '(+ x y z) ) 'x)
+      (eql (collect-terms 'xx '(- 2xx xx) ) 'xx)
+      (eql (collect-terms 'y  '(- 2y 2y 2y)) '-2y)
+      (eql (collect-terms 'yx '(+ x 5yx 5yx)) '10yx)
+      (eql (collect-terms 'y '(- 2y y 5 10)) 'y)
+      (eql (collect-terms '2x '(+ x x y)) nil)))
+
+;; Tets for (collect-integers)
+(defun test-collect-integers ()
+  (check
+    (eql (collect-integers '(+ 1 x 1 y 1 z)) 3)
+    (eql (collect-integers '(+ 1 2 3 4 5 6)) 21)
+    (eql (collect-integers '(+ x y z)) 0)))
+
+
+(format t "Testing has strip-chars~%")
 (test-strip-chars)
-(terpri)
-
-(format t "Testing strip-symbols~%")
-(test-strip-symbols)
-(terpri)
-
-(format t "Testing has-integers~%")
-(test-string-has-integers)
-(terpri)
-
-(format t "Testing list-has-integers~%")
-(test-list-has-integers)
-(terpri)
-
-(format t "Testing collect-terms~%")
-(test-collect-terms)
-(terpri)
-
-(format t "Testing has get-sign~%")
-(test-get-sign)
 (terpri)
 
 (format t "Testing is-operator~%")
 (test-is-operator)
 (terpri)
 
-(format t "Testing get-last-integer-position~%")
-(test-get-last-integer-position)
+(format t "Testing has sign-value~%")
+(test-sign-value)
 (terpri)
 
+(format t "Testing has sign-of~%")
+(test-sign-of)
+(terpri)
+
+(format t "Testing has-integers?~%")
+(test-has-integers?)
+(terpri)
+
+(format t "Testing list-has-integers?~%")
+(test-list-has-integers?)
+(terpri)
+
+(format t "Testing is-in-list?~%")
+(test-is-in-list?)
+(terpri)
+
+(format t "Testing collect-terms~%")
+(test-collect-terms)
+(terpri)
+
+(format t "Testing collect-integers~%")
+(test-collect-integers)
+(terpri)
