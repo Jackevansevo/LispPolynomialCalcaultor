@@ -1,4 +1,5 @@
 (require "simplyfy.cl")
+(require "polynomial.cl")
 
 (defun report-result (result form)
   (format t "~:[~c[31mFAIL~;~c[32mPASS~] ~c[0m ... ~a~%" result #\ESC #\ESC form)
@@ -89,6 +90,19 @@
     (eql (collect-integers '(+ x y z)) 0)))
 
 
+(defun test-polly+ ()
+  (check
+    (equal (poly+ '(+ x y z 3 2 1) '(+ x y z 1 2 3)) '(+ 2X 2Y 2Z 12))
+    (equal (poly+ '(- 5x x) '(+ 10 2x)) '(+ 6x 10))
+    (equal (poly+ '(+ 2z z 5x 1 2 3) (poly+ '(+ 2x x) '(+ 2y y))) '(+ 3Z 8X 6 3Y))))
+
+
+(defun test-polly- ()
+  (check
+    (equal (poly- '(- 10x x) '(+ 5x 2)) '(+ 4x -2))
+    (equal (poly- '(+ 2x 4x 5z) '(+ x x 2z)) '(+ 4x 3z))
+    ))
+
 (format t "Testing has strip-chars~%")
 (test-strip-chars)
 (terpri)
@@ -123,4 +137,12 @@
 
 (format t "Testing collect-integers~%")
 (test-collect-integers)
+(terpri)
+
+(format t "Testing polly+")
+(test-polly+)
+(terpri)
+
+(format t "Testing polly-")
+(test-polly-)
 (terpri)
