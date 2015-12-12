@@ -9,45 +9,44 @@
 
 
 ;; Returns true if input contains integers
-(defun has-integers (input)
+(defun has-integers? (input)
   (if (integerp input)
     T
-    (find T (map 'list #'check-if-integer (string input)))))
+    (find T (map 'list #'is-integer? (string input)))))
 
 
 ;; Returns true if character is an integer
-(defun check-if-integer (input)
+(defun is-integer? (input)
   (if (integerp (digit-char-p input)) T NIl))
+
+
+;; Returns true if a list contains intergers
+(defun list-has-integers? (input)
+  (if (some 'integerp input) T Nil))
 
 
 ;; Returns the value of a sign
 (defun sign-value (input)
   (if (or (is-operator input) (integerp input)) input
-    (if (has-integers input)
+    (if (has-integers? input)
       (let ((x (concatenate 'string (write-to-string (sign-of input)) "|")))
         (parse-integer(strip-chars x input))) 1)))
 
 
-;; Returns true if a list contains intergers
-(defun list-has-integers (input)
-  (if (some 'integerp input) T Nil))
-
-
-;; Returns the sign-of of a given input value
+;; Returns the sign of an input
 (defun sign-of (input)
-  (if (numberp input)
-    nil
-    (intern(strip-chars "0123456789|" input))))
+  (if (integerp input) nil
+    (intern(remove-if #'digit-char-p (string input)))))
 
 
 ;; Returns true if target can be found in list
-(defun check-if-in-list (target input)
+(defun is-in-list? (target input)
   ;; If the input is empty then return false
   (if (eql input nil)
     nil
     (if (equal (car input) target)
       T
-      (check-if-in-list target (rest input)))))
+      (is-in-list? target (rest input)))))
 
 
 ;; Collects terms within a given list
@@ -82,7 +81,8 @@
   (if (listp obj) (mapcan #'flatten obj) (list obj)))
 
 
-;; [TODO] If I had time I'd rewrite this using lambda expressions
+;; [TODO] Rewrite with maps an lambdas
+;; This is disgusting code, I'm not proud,
 ;; Returns a simplyfied version of the polynomial expression
 (defun simplyfy-term (input &key (orig input) (scanned '()) (results '()))
   (if (eql input nil)
@@ -93,7 +93,7 @@
        (return-from simplyfy-term input))
       ;; If it's an integer
       ((integerp (car input))
-       (if (not(list-has-integers scanned))
+       (if (not(list-has-integers? scanned))
          (let ((new-results (append results (list(collect-integers orig))))
                (new-scanned (append scanned (list(car input)))))
            (simplyfy-term (rest input) :scanned new-scanned :orig orig :results new-results))
@@ -101,7 +101,7 @@
       ;; If it's a number with a symbol
       ((not (eql (sign-value (car input)) nil))
        (if (not (is-operator (car input)))
-         (if (not(check-if-in-list (sign-of (car input)) scanned))
+         (if (not(is-in-list? (sign-of (car input)) scanned))
            (let ((new-results (append results (list(collect-terms (sign-of (car input)) orig))))
                  (new-scanned (append scanned (list(sign-of (car input))))))
              (simplyfy-term (rest input) :scanned new-scanned :orig orig :results new-results))
