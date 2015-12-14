@@ -40,10 +40,10 @@
 ;; Tests for (sign-of)
 (defun test-sign-of ()
   (check
-    (string-equal (sign-of 'x) "X")
-    (string-equal (sign-of 'xy) "XY")
-    (string-equal (sign-of '5x) "X")
-    (string-equal (sign-of '200xy) "XY")))
+    (eql (sign-of 'x) 'x)
+    (eql (sign-of 'xy) 'xy)
+    (eql (sign-of '5x) 'x)
+    (eql (sign-of '200xy) 'xy)))
 
 ;; Tests for (has-integers?)
 (defun test-has-integers? ()

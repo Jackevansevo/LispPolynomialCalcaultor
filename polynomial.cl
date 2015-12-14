@@ -3,10 +3,18 @@
 ;; ARITHMETIC FUNCTIONS
 
 ;; Adds together two polynomials
-(defun poly+ (p1 p2 &key (result '(+)))
+(defun poly+ (p1 p2)
   (let ((p1 (simplyfy p1))
         (p2 (simplyfy p2)))
     (let ((result (append '(+)(simplyfy(append '(+) p1 p2)))))
+      result)))
+
+
+;; Subtracts two polynomials
+(defun poly- (p1 p2)
+  (let ((p1 (simplyfy p1))
+        (p2 (simplyfy p2)))
+    (let ((result (append '(+)(simplyfy(append '(-) p1 p2)))))
       result)))
 
 
@@ -49,8 +57,3 @@
   (let ((input (get-user-input args)))
     ;; Simplyfy user input if necessary
     (funcall (car input) (nth 1 input) (nth 2 input))))
-
-
-;; A bunch of shitty test cases
-(format t "~d~%" (poly+ '(+ 2z z 5x 1 2 3) (poly+ '(+ 2x x) '(+ 2y y))))
-; (main)

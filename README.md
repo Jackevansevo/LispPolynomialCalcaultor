@@ -23,4 +23,29 @@
 
 # Instructions
 
-- Coming soon!
+Polynomials are represented like the following:
+
+'''
+(+ 2x 4x 5z 28)
+'''
+
+which means 2x 4x + 5z + 28
+
+Polynomials can be added and subtracted using the poly+ and poly- functions like
+below
+
+'''
+(poly+ '(+ x y z 3 2 1) '(+ x y z 1 2 3))
+(poly+ '(- 5x x) '(+ 10 2x))
+(poly- '(- 10x x) '(+ 5x 2))
+
+'''
+
+# What works
+- Mostly poly+ and poly-
+- Simplification
+
+# Stuff to Improve
+- It's bad at collecting negative terms
+- The simplify function can be rewritten with lambdas
+
